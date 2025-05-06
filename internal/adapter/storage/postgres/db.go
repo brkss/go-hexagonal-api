@@ -13,7 +13,7 @@ import (
 )
 
 // migrationsFS is a filesystem that embeds the migrations folder
-//
+
 //go:embed migrations/*.sql
 var migrationsFS embed.FS
 

@@ -2,13 +2,13 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"os"
 
 	"github.com/brkss/dextrace-server/internal/adapter/config"
 	"github.com/brkss/dextrace-server/internal/adapter/logger"
 	"github.com/brkss/dextrace-server/internal/adapter/storage/postgres"
+	"github.com/brkss/dextrace-server/internal/adapter/storage/redis"
 )
 
 
@@ -45,9 +45,13 @@ func main() {
 
 	slog.Info("Successfuly migrated the database")
 
+	// Init cache 
+	cache, err := redis.New(ctx, config.Redis)
+	if err != nil {
+		slog.Error("Error Initializing cache connection", "error", err)
+		os.Exit(0)
+	}
+	defer cache.Close()
+
 	
-
-	fmt.Printf("%v : ", config.App);
-
-	//fmt.Println("Hello, World!")
 }
