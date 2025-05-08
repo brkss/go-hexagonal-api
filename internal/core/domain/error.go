@@ -9,4 +9,5 @@ var (
 	ErrInvalidToken = errors.New("invalid token")
 	ErrConflictingData = errors.New("data conflicts with existing data in unique column")
 	ErrNoDataFound = errors.New("no data was found")
+	ErrInternal = errors.New("internal server error")
 )
