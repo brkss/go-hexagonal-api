@@ -8,7 +8,9 @@ import (
 	"github.com/Masterminds/squirrel"
 	"github.com/brkss/dextrace-server/internal/adapter/config"
 	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/golang-migrate/migrate/v4/source/iofs"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -23,6 +25,7 @@ var migrationsFS embed.FS
 * It also holds a refrence to squirrel.StatemenetBuilderType
 * Which is used to build SQL queries that compatible with postgreSQL
 */
+
 type DB struct {
 	*pgxpool.Pool
 	QueryBuilder *squirrel.StatementBuilderType
@@ -78,4 +81,15 @@ func (db *DB) Migrate() error {
 	}
 
 	return nil;
+}
+
+// ErrorCode returns the error code of the given error
+func (db *DB) ErrorCode(err error) string {
+	pgErr := err.(*pgconn.PgError)
+	return pgErr.Code
+}
+
+// Close closes the database connection
+func (db *DB) Close() {
+	db.Pool.Close()
 }

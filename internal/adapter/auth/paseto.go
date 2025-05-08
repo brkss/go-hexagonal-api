@@ -22,7 +22,7 @@ type PasetoToken struct {
 }
 
 // new create a new paseto instance
-func New(config config.Token) (port.TokenService, error) {
+func New(config *config.Token) (port.TokenService, error) {
 	duration, err := time.ParseDuration(config.Duration)
 	if err != nil {
 		return nil, domain.ErrTokenDuration;
