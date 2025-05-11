@@ -53,7 +53,7 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 	return user, nil
 }
 
-func (ur *UserRepository) GetUserById(ctx context.Context, id uint64) (*domain.User, error) {
+func (ur *UserRepository) GetUserById(ctx context.Context, id int64) (*domain.User, error) {
 
 	var user domain.User
 

@@ -13,7 +13,7 @@ type UserRepository interface {
 	// CreateUser creates a new user in the database 
 	CreateUser(ctx context.Context, user *domain.User) (*domain.User, error);
 	// GetUserById gets user by id 
-	GetUserById(ctx context.Context, id uint64)(*domain.User, error)
+	GetUserById(ctx context.Context, id int64)(*domain.User, error)
 	// GetUserByEmail gets user by it's email 
 	GetUserByEmail(ctx context.Context, email string) (*domain.User, error)
 }

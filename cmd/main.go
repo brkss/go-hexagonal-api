@@ -5,10 +5,14 @@ import (
 	"log/slog"
 	"os"
 
+	paseto "github.com/brkss/dextrace-server/internal/adapter/auth"
 	"github.com/brkss/dextrace-server/internal/adapter/config"
+	http "github.com/brkss/dextrace-server/internal/adapter/handler"
 	"github.com/brkss/dextrace-server/internal/adapter/logger"
 	"github.com/brkss/dextrace-server/internal/adapter/storage/postgres"
+	"github.com/brkss/dextrace-server/internal/adapter/storage/postgres/repository"
 	"github.com/brkss/dextrace-server/internal/adapter/storage/redis"
+	"github.com/brkss/dextrace-server/internal/core/service"
 )
 
 
@@ -52,6 +56,20 @@ func main() {
 		os.Exit(0)
 	}
 	defer cache.Close()
+
+
+	// Init Token Service 
+	token, err := paseto.New(config.Token)
+	if err != nil {
+		slog.Error("Error initializing token service", "error", err)
+		os.Exit(1)
+	}
+	
+
+	// dependency injection 
+	userRepo := repository.NewUserRepository(db)
+	userService := service.NewUserService(userRepo, cache)
+	userHandler := http.NewUserHandler(userService)
 
 	
 }
