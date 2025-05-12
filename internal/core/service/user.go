@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/brkss/dextrace-server/internal/core/domain"
 	"github.com/brkss/dextrace-server/internal/core/port"
@@ -26,9 +27,9 @@ func NewUserService(repo port.UserRepository, cache port.CacheRepository) *UserS
 }
 
 func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain.User, error) {
-
 	hashed, err := utils.HashPassword(user.Password) 
 	if err != nil {
+		slog.Error("Failed to hash password", "error", err)
 		return nil, domain.ErrInternal
 	}
 
@@ -38,25 +39,27 @@ func (us *UserService) Register(ctx context.Context, user *domain.User) (*domain
 		if err == domain.ErrConflictingData {
 			return nil, err
 		}
+		slog.Error("Failed to create user", "error", err)
 		return nil, domain.ErrInternal
 	}
 
 	cacheKey := utils.GenerateCacheKey("user", user.ID)
 	userSerialized, err := utils.Serialize(user)
 	if err != nil {
-		return nil, domain.ErrInternal;
+		slog.Error("Failed to serialize user", "error", err)
+		return nil, domain.ErrInternal
 	}
 
 	err = us.cache.Set(ctx, cacheKey, userSerialized, 0)
 	if err != nil {
-		return nil, domain.ErrInternal
+		slog.Error("Failed to cache user", "error", err)
+		// Don't return error here as the user was created successfully
 	}
 
-	// caching ...
-	return user, nil;
+	return user, nil
 }
 
-func (us *UserService) GetUser(ctx context.Context, id int64) (*domain.User, error) {
+func (us *UserService) GetUser(ctx context.Context, id string) (*domain.User, error) {
 	var user *domain.User;
 
 	cachedKey := utils.GenerateCacheKey("user", id)

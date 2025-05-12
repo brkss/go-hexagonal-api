@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log/slog"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/brkss/dextrace-server/internal/adapter/storage/postgres"
@@ -26,12 +27,13 @@ func NewUserRepository(db *postgres.DB) (*UserRepository) {
 
 func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*domain.User, error) {
 	query := ur.DB.QueryBuilder.Insert("users").
-		Columns("name", "email", "password").
-		Values(user.Name, user.Email, user.Password).
-		Suffix("RETURNNING *")
+		Columns("id", "name", "email", "password").
+		Values(user.ID, user.Name, user.Email, user.Password).
+		Suffix("RETURNING *")
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, err;
+		slog.Error("Failed to build SQL query", "error", err)
+		return nil, domain.ErrInternal
 	} 
 
 	err = ur.DB.QueryRow(ctx, sql, args...).Scan(
@@ -47,13 +49,14 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *domain.User) (*d
 		if errCode := ur.DB.ErrorCode(err); errCode == "23505" {
 			return nil, domain.ErrConflictingData
 		}
-		return nil, err
+		slog.Error("Database error while creating user", "error", err)
+		return nil, domain.ErrInternal
 	}
 
 	return user, nil
 }
 
-func (ur *UserRepository) GetUserById(ctx context.Context, id int64) (*domain.User, error) {
+func (ur *UserRepository) GetUserById(ctx context.Context, id string) (*domain.User, error) {
 
 	var user domain.User
 

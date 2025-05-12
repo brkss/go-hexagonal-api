@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"os"
 
@@ -71,5 +72,23 @@ func main() {
 	userService := service.NewUserService(userRepo, cache)
 	userHandler := http.NewUserHandler(userService)
 
-	
+	// Init Router 
+	router, err := http.NewRouter(
+		config.HTTP,
+		token,
+		*userHandler,
+	)
+	if err != nil {
+		slog.Error("Error initializing router", "error", err)
+		os.Exit(1)
+	}
+
+	// Start Server ! 
+	listenAddr := fmt.Sprintf("%s:%s", config.HTTP.URL, config.HTTP.Port)
+	slog.Info("Starting the HTTP server", "listen_address", listenAddr)
+	err = router.Run(listenAddr)
+	if err != nil {
+		slog.Error("Error starting the HTTP server", "error", err)
+		os.Exit(1)
+	}
 }

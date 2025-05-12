@@ -4,7 +4,7 @@ import "time"
 
 // User is an entity that represent user
 type User struct {
-	ID uint64
+	ID string
 	Name string
 	Email string
 	Password string
