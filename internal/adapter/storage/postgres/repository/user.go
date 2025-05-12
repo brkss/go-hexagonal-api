@@ -89,7 +89,7 @@ func (ur *UserRepository) GetUserByEmail(ctx context.Context, email string) (*do
 
 	var user domain.User
 
-	query := ur.DB.QueryBuilder.Select("*").Where(sq.Eq{"email": email}).Limit(1)
+	query := ur.DB.QueryBuilder.Select("*").From("users").Where(sq.Eq{"email": email}).Limit(1)
 	sql, args, err := query.ToSql()
 
 	if err != nil {

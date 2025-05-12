@@ -109,3 +109,16 @@ func HandleSuccess(ctx *gin.Context, data any) {
 	rsp := NewResponse(true, "success", data)
 	ctx.JSON(http.StatusOK, rsp)
 }
+
+// authResponse represent an authentication response body 
+type authResponse struct {
+	AccessToken string `json:"token"`
+}
+
+// newAuthResponse create a new auth response body 
+func newAuthResponse(token string) authResponse {
+	return  authResponse {
+		AccessToken: token,
+	}
+}
+

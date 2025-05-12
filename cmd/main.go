@@ -72,11 +72,15 @@ func main() {
 	userService := service.NewUserService(userRepo, cache)
 	userHandler := http.NewUserHandler(userService)
 
+	authService := service.NewAuthService(userRepo, token)
+	authHandler := http.NewAuthHandler(authService)
+
 	// Init Router 
 	router, err := http.NewRouter(
 		config.HTTP,
 		token,
 		*userHandler,
+		*authHandler,
 	)
 	if err != nil {
 		slog.Error("Error initializing router", "error", err)

@@ -1,6 +1,10 @@
 package port
 
-import "github.com/brkss/dextrace-server/internal/core/domain"
+import (
+	"context"
+
+	"github.com/brkss/dextrace-server/internal/core/domain"
+)
 
 // TokenService is an interface for interacting with token-related buisness logic
 type TokenService interface {
@@ -10,3 +14,7 @@ type TokenService interface {
 	VerifyToken(token string)(*domain.TokenPayload, error)
 }
 
+type AuthService interface {
+	// Login authenticate user by email and password and return token 
+	Login(ctx context.Context, email, password string)(string, error)
+}

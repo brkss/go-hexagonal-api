@@ -20,6 +20,7 @@ func NewRouter(
 	config *config.HTTP,
 	token port.TokenService,
 	userHandler UserHandler,
+	authHandler AuthHandler,
 ) (*Router, error) { 
 	if config.Env == "poroduction" {
 		gin.SetMode(gin.ReleaseMode)
@@ -44,6 +45,7 @@ func NewRouter(
 		user := v1.Group("/users")
 		{
 			user.POST("/", userHandler.Register)
+			user.POST("/login", authHandler.Login)
 		}
 	}
 
