@@ -29,7 +29,6 @@ type registerRequest struct {
 
 func (uh *UserHandler)Register(ctx *gin.Context){
 
-	
 	var req registerRequest;
 	if err := ctx.ShouldBindBodyWithJSON(&req); err != nil {
 		ValidationError(ctx, err);
@@ -57,4 +56,31 @@ func (uh *UserHandler)Register(ctx *gin.Context){
 
 	rsp := newUserResponse(user)
 	HandleSuccess(ctx, rsp) 
+}
+
+
+func (uh *UserHandler)GetUserProfile(ctx *gin.Context) {
+	payload, exists := ctx.Get(authorizationPayloadKey)
+	if !exists {
+		HandleError(ctx, domain.ErrInvalidToken)
+		return
+	}
+
+	tokenPayload, ok := payload.(*domain.TokenPayload)
+	if !ok {
+		HandleError(ctx, domain.ErrInvalidToken)
+		return
+	}
+
+	user, err := uh.svc.GetUser(ctx, tokenPayload.UserID)
+	if err != nil {
+		HandleError(ctx, err)
+		return
+	}
+
+	// Remove sensitive data before sending response
+	user.Password = ""
+
+	rsp := newUserResponse(*user)
+	HandleSuccess(ctx, rsp)
 }

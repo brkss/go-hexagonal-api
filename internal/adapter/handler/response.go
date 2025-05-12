@@ -122,3 +122,16 @@ func newAuthResponse(token string) authResponse {
 	}
 }
 
+
+// handleAbort sends an error response withg the right status code and abort request 
+func handleAbort(ctx *gin.Context, err error) {
+	statusCode, ok := errorStatusMap[err]
+	if !ok {
+		statusCode = http.StatusInternalServerError
+	}
+
+	errMsg := parseError(err)
+	errRsp := NewErrorResponse(errMsg)
+
+	ctx.AbortWithStatusJSON(statusCode, errRsp)
+}

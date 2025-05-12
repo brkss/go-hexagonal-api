@@ -46,6 +46,10 @@ func NewRouter(
 		{
 			user.POST("/", userHandler.Register)
 			user.POST("/login", authHandler.Login)
+			authUser := user.Group("/").Use(authorizationMiddleware(token))
+			{
+				authUser.GET("/me", userHandler.GetUserProfile)
+			}
 		}
 	}
 
